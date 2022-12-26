@@ -15,14 +15,13 @@ router.get("/currentUser", (request, response) => {
     }
 });
 
-router.post(
-    "/login",
+router.post("/login", (request, response, next) => {
     passport.authenticate("local", (error, user, message) => {
         if (error) {
             throw error;
         }
         if (!user) {
-            response.send(message);
+            response.status(403).send(message);
         } else {
             request.logIn(user, (error) => {
                 if (error) {
@@ -33,8 +32,8 @@ router.post(
                     .send({ message: "successfully logged in" });
             });
         }
-    })
-);
+    })(request, response, next);
+});
 
 router.post("/register", async (request, response) => {
     try {
@@ -55,14 +54,15 @@ router.post("/register", async (request, response) => {
                     lastName: request.body.lastName,
                     email: request.body.email,
                     password: hashedPassword,
-                    role: request.body.role,
                 });
 
                 await newUser.save();
                 response
                     .status(201)
                     .send({ message: "user successfully created " });
-            } catch (error) {}
+            } catch (error) {
+                response.status(500).send(error);
+            }
         }
     } catch (error) {
         response.sendStatus(500);
