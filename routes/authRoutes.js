@@ -5,7 +5,6 @@ const bcrypt = require("bcrypt");
 const User = require("../models/User");
 
 const passport = require("passport");
-const { response, request } = require("express");
 
 router.get("/currentUser", (request, response) => {
     if (request.isAuthenticated()) {
