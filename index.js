@@ -50,13 +50,21 @@ app.use(passport.session());
 
 initializePassport(passport);
 
-const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
 const projectRoutes = require("./routes/projectRoutes");
+const versionRoutes = require("./routes/versionRoutes");
+const ticketRoutes = require("./routes/ticketRoutes");
+const commentRoutes = require("./routes/commentRoutes");
+const assignmentRoutes = require("./routes/assignmentRoutes");
 
 // Initialize the routes of the api
 app.use("/api/users", userRoutes);
 app.use("/api/projects", projectRoutes);
+app.use("/api/versions", versionRoutes);
+app.use("/api/tickets", ticketRoutes);
+app.use("/api/comments", commentRoutes);
+app.use("/api/assigments", assignmentRoutes);
 app.use("/auth", authRoutes);
 
 app.listen(process.env.SERVER_PORT, () => {
