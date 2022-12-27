@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const VersionSchema = new VersionSchema({
+const VersionSchema = new mongoose.Schema({
     projectId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Project",
