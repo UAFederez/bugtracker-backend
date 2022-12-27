@@ -52,9 +52,11 @@ initializePassport(passport);
 
 const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
+const projectRoutes = require("./routes/projectRoutes");
 
 // Initialize the routes of the api
 app.use("/api/users", userRoutes);
+app.use("/api/projects", projectRoutes);
 app.use("/auth", authRoutes);
 
 app.listen(process.env.SERVER_PORT, () => {
