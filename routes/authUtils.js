@@ -1,6 +1,10 @@
-export function requireUserIsAuth(request, response, next) {
+function requireUserIsAuth(request, response, next) {
     if (request.isAuthenticated()) {
-        return next;
+        return next();
     }
     response.sendStatus(403);
 }
+
+module.exports = {
+    requireUserIsAuth,
+};
