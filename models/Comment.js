@@ -1,12 +1,16 @@
 const mongoose = require("mongoose");
 
 const CommentSchema = new mongoose.Schema({
+    parentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comment",
+    },
     ticketId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Ticket",
         required: true,
     },
-    author: {
+    authorId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true,
