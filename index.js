@@ -10,7 +10,10 @@ const passport = require("passport");
 const mongoose = require("mongoose");
 const initializePassport = require("./passport-config");
 
-const mongodbURI = `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASS}@gettingstarted.mxdv2.mongodb.net/${process.env.MONGODB_DBNAME}?retryWrites=true&w=majority`;
+const mongodbURI =
+    process.env.NODE_ENV === "development"
+        ? process.env.MONGODB_DEV_URI
+        : process.env.MONGODB_PROD_URI;
 
 mongoose.connect(
     mongodbURI,
