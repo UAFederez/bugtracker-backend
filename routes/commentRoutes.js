@@ -87,7 +87,7 @@ router.delete("/delete/:id", async (request, response) => {
         if (!existingComment) {
             response.status(404).send({ message: "Comment not found" });
         } else {
-            await Commend.deleteOne({ _id: request.params.id });
+            await Comment.deleteOne({ _id: request.params.id });
             response
                 .status(200)
                 .send({ message: "Comment successfully deleted" });
