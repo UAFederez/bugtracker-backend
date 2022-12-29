@@ -14,11 +14,6 @@ const mongodbURI =
     process.env.NODE_ENV === "development"
         ? process.env.MONGODB_DEV_URI
         : process.env.MONGODB_PROD_URI;
-<<<<<<< HEAD
-=======
-
-console.log("Connecting to:", mongodbURI);
->>>>>>> origin/main
 
 mongoose.connect(
     mongodbURI,
