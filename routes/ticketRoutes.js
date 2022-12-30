@@ -6,7 +6,10 @@ const Version = require("../models/Version");
 
 router.get("/", async (request, response) => {
     try {
-        const tickets = await Ticket.find({});
+        const tickets = await Ticket.find({}).populate(
+            "reporterId",
+            "_id firstName lastName email"
+        );
         response.status(200).send(tickets);
     } catch (error) {
         console.error(error);
@@ -18,8 +21,9 @@ router.get("/:id", async (request, response) => {
         const ticket = await Ticket.findById(request.params.id);
         if (!ticket) {
             response.status(404).send({ message: "No ticket with that ID" });
+        } else {
+            response.status(200).send(ticket);
         }
-        response.status(200).send(ticket);
     } catch (error) {
         console.error(error);
         response.status(500).send(error);
@@ -63,19 +67,23 @@ router.put("/:id", async (request, response) => {
     try {
         const existingTicket = await Ticket.findById(request.params.id);
         if (!existingTicket) {
-            response.status(404).send({ message: "Ticket not found" });
+            return response.status(404).send({ message: "Ticket not found" });
         }
         if (request.body.hasOwnProperty("versionId")) {
             const newVersion = await Version.findById(request.body.versionId);
             if (!newVersion) {
-                response.status(404).send({ message: "Version not found" });
+                return response
+                    .status(404)
+                    .send({ message: "Version not found" });
             }
             existingTicket.versionId = newVersion._id;
         }
         if (request.body.hasOwnProperty("projectId")) {
             const newProject = await Project.findById(request.body.projectId);
             if (!newProject) {
-                response.status(404).send({ message: "Project not found" });
+                return response
+                    .status(404)
+                    .send({ message: "Project not found" });
             }
             existingTicket.projectId = newProject._id;
         }

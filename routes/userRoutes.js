@@ -41,24 +41,25 @@ router.get("/:id", async (request, response) => {
 // is an admin
 router.post("/new", async (request, response) => {
     try {
-        const existingUser = await User.find({ email: request.body.email });
+        const existingUser = await User.findOne({ email: request.body.email });
 
         if (existingUser) {
             response
                 .status(403)
                 .send({ message: "User with that email already exists" });
+        } else {
+            const hashedPassword = await bcrypt.hash(request.body.password, 10);
+
+            const newUser = new User({
+                firstName: request.body.firstName,
+                lastName: request.body.lastName,
+                email: request.body.email,
+                password: hashedPassword,
+            });
+
+            await newUser.save();
+            response.status(201).send(newUser);
         }
-        const hashedPassword = await bcrypt.hash(request.body.password, 10);
-
-        const newUser = new User({
-            firstName: request.body.firstName,
-            lastName: request.body.lastName,
-            email: request.body.email,
-            password: hashedPassword,
-        });
-
-        await newUser.save();
-        response.status(201).send({ message: "user successfully created " });
     } catch (error) {
         response.status(500).send(error);
     }

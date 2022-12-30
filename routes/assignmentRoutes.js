@@ -52,13 +52,14 @@ router.post("/new", async (request, response) => {
 
         if (existingAssignment) {
             response.status(403).send({ message: "Assignment already exists" });
+        } else {
+            const newAssignment = new Assignment({
+                developerId: request.body.developerId,
+                ticketId: request.body.ticketId,
+            });
+            await newAssignment.save();
+            response.status(200).send(newAssignment);
         }
-        const newAssignment = new Assignment({
-            developerId: request.body.developerId,
-            ticketId: request.body.ticketId,
-        });
-        await newAssignment.save();
-        response.status(200).send(newAssignment);
     } catch (error) {
         response.status(500).send(error);
     }
@@ -88,11 +89,12 @@ router.delete("/delete/:id", async (request, response) => {
         const existingAssignment = Assignment.findById(request.params.id);
         if (!existingAssignment) {
             response.status(403).send({ message: "Assignment does not exist" });
+        } else {
+            await Assignment.deleteOne({ _id: existingAssignment._id });
+            response
+                .status(200)
+                .send({ message: "Successfully deleted Assignment" });
         }
-        await Assignment.deleteOne({ _id: existingAssignment._id });
-        response
-            .status(200)
-            .send({ message: "Successfully deleted Assignment" });
     } catch (error) {
         response.status(500).send(error);
     }
