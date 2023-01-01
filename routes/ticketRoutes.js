@@ -46,13 +46,12 @@ router.post("/new", async (request, response) => {
         const data = {
             versionId: request.body.versionId,
             projectId: request.body.projectId,
-            reporterId: request.body.reporterId,
+            reporterId: request.user._id,
             title: request.body.title,
             description: request.body.description,
             status: request.body.status,
             severity: request.body.severity,
             dateSubmitted: request.body.dateSubmitted,
-            dateUpdated: request.body.dateUpdated,
         };
 
         const newTicket = new Ticket(data);
