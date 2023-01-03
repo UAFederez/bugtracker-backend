@@ -18,7 +18,9 @@ router.get("/", async (request, response) => {
 });
 router.get("/:id", async (request, response) => {
     try {
-        const ticket = await Ticket.findById(request.params.id);
+        const ticket = await Ticket.findById(request.params.id)
+            .populate("reporterId", "_id firstName lastName email")
+            .populate("projectId");
         if (!ticket) {
             response.status(404).send({ message: "No ticket with that ID" });
         } else {
@@ -49,9 +51,9 @@ router.post("/new", async (request, response) => {
             reporterId: request.user._id,
             title: request.body.title,
             description: request.body.description,
-            status: request.body.status,
+            status: "Pending",
             severity: request.body.severity,
-            dateSubmitted: request.body.dateSubmitted,
+            dateSubmitted: Date.now(),
         };
 
         const newTicket = new Ticket(data);
