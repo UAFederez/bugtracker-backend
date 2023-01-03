@@ -44,7 +44,9 @@ router.get("/byTicket/:id", async (request, response) => {
     try {
         const commentsOfTicket = await Comment.find({
             ticketId: request.params.id,
-        }).sort({ dateCreated: 1 });
+        })
+            .sort({ dateCreated: 1 })
+            .populate("authorId", "_id firstName lastName email");
         const commentsAsTree = convertCommentsToTree(commentsOfTicket);
         response.status(200).send(commentsAsTree);
     } catch (error) {
@@ -68,9 +70,9 @@ router.post("/new", async (request, response) => {
         const newComment = new Comment({
             parentId: request.body.parentId,
             ticketId: request.body.ticketId,
-            authorId: request.body.authorId,
+            authorId: request.user._id,
             text: request.body.text,
-            datePosted: request.body.datePosted,
+            datePosted: Date.now(),
         });
 
         await newComment.save();
