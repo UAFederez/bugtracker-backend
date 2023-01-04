@@ -32,10 +32,39 @@ router.get("/:id", async (request, response) => {
     }
 });
 
-router.get("/filter/:ticketFilter", async (request, response) => {
-    const ticketFilter = request.params.ticketFilter;
+// The filter was designed as POST to provide more flexibility in how the
+// query parameters are passed instead of having to deal with the limitations
+// (length, encoding, etc.) of having to encode the JSON body in the url
+router.post("/filter", async (request, response) => {
+    const parsedFilter = request.body;
+    const ticketFilter = {};
+
+    Object.entries(parsedFilter).forEach(([key, value]) => {
+        if (key === "queryString") {
+            ticketFilter.$or = [
+                {
+                    title: {
+                        $regex: `.*${value}.*`,
+                        $options: "i",
+                    },
+                },
+                {
+                    description: {
+                        $regex: `.*${value}.*`,
+                        $options: "i",
+                    },
+                },
+            ];
+        } else if (value.length !== 0) {
+            ticketFilter[key] = value;
+        }
+    });
+
     try {
-        const tickets = await Ticket.find(ticketFilter);
+        const tickets = await Ticket.find(ticketFilter)
+            .populate("projectId")
+            .populate("reporterId", "_id firstName lastName email")
+            .sort({ dateSubmitted: -1 });
         response.status(200).send(tickets);
     } catch (error) {
         console.error(error);
