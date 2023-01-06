@@ -3,26 +3,6 @@ const router = express.Router();
 
 const Comment = require("../models/Comment");
 
-// Insert the comment using breadth-first search
-function insertCommentInTree(comment, topLevelComments) {
-    let queue = [...topLevelComments];
-    while (queue) {
-        const length = queue.length;
-        let newEntries = [];
-
-        for (let i = 0; i < length; i++) {
-            const front = queue.pop();
-            newEntries = [...newEntries, ...front.responses];
-
-            if (front.comment._id.toString() === comment.parentId.toString()) {
-                front.responses.push({ comment, responses: [] });
-                return;
-            }
-        }
-        queue = [...newEntries];
-    }
-}
-
 // Precondition:
 // The comments array must be sorted in the order of the datePosted field. For
 // the sake of simplicity, this is required for now such that by moving linearly
@@ -30,11 +10,17 @@ function insertCommentInTree(comment, topLevelComments) {
 // encountered before a child comment.
 function convertCommentsToTree(comments) {
     const topLevelComments = [];
+    const commentParentMap = new Map();
     for (comment of comments) {
         if (!comment.parentId) {
-            topLevelComments.push({ comment, responses: [] });
+            const topLevelComment = { comment, responses: [] };
+            topLevelComments.push(topLevelComment);
+            commentParentMap.set(comment._id.toString(), topLevelComment);
         } else {
-            insertCommentInTree(comment, topLevelComments);
+            const childComment = { comment, responses: [] };
+            const parent = commentParentMap.get(comment.parentId.toString());
+            commentParentMap.set(comment._id.toString(), childComment);
+            parent.responses.push(childComment);
         }
     }
     return topLevelComments;
@@ -47,6 +33,7 @@ router.get("/byTicket/:id", async (request, response) => {
         })
             .sort({ dateCreated: 1 })
             .populate("authorId", "_id firstName lastName email");
+
         const commentsAsTree = convertCommentsToTree(commentsOfTicket);
         response.status(200).send(commentsAsTree);
     } catch (error) {
